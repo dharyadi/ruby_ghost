@@ -3,10 +3,10 @@
 class Player
   attr_reader :name
   def initialize(name)
-    @name = valid_name(name)
+    @name = Player.valid_name(name)
   end
 
-  def valid_name(name)
+  def self.valid_name(name)
     test_name = name
     while test_name == ''
       puts 'Please enter a valid name.'
@@ -16,7 +16,7 @@ class Player
     test_name.capitalize
   end
 
-  def guess(str)
+  def self.guess(str)
     letter = str.to_s
     while /[a-zA-z]/.match(letter) == nil || letter.length != 1
       puts 'Please enter a valid letter from A to Z.'
@@ -31,5 +31,5 @@ if $PROGRAM_NAME == __FILE__
   player = Player.new('')
   puts player.name
   #player.guess(1)
-  player.guess('i')
+  #player.guess('i')
 end
