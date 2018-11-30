@@ -30,6 +30,8 @@ class Game
       puts "Player #{ num + 1 } name:"
       players << Player.new(gets.chomp)
     end
+    puts '-----------------------------------------'
+    puts
   end
 
   def self.fragment_is_word?(fragment)
@@ -50,6 +52,10 @@ class Game
 
   def update_score(player)
     @scores[ player.name ] += 1
+  end
+
+  def score_to_text(score)
+    LOSING_TEXT[0...score]
   end
 
   def show_bad_message(player)
@@ -86,8 +92,24 @@ class Game
 
   def set_loser(turns)
     loser = @players[ (turns - 2) % @players.length ]
+    show_bad_message(loser)
     update_score(loser)
     update_players_list(loser)
+  end
+
+  def show_scores
+    puts '-----------------------------------------'
+    puts 'SCOREBOARD:'
+    @scores.each { |name, score| puts "#{name}: #{score_to_text(score)}" }
+    puts '-----------------------------------------'
+  end
+
+  def word_complete(turns, player)
+    puts "Word complete! Great job #{player.name}"
+    set_loser(turns)
+    puts
+    # show_scores
+    # puts
   end
 
   def round
@@ -106,20 +128,17 @@ class Game
         turns -= 1 if update_players_list(current_player)
       end
       return if winner?
-      # if winner? # check if only 1 player left
-      #   show_winner
-      #   return false
-      # end
       Game.show_fragment(fragment)
       turns += 1
     end
-    set_loser(turns)
+    word_complete(turns, current_player)
   end
 
   def play
-    round until winner?
-    #   round
-    # end
+    until winner?
+      round
+      show_scores
+    end
     show_winner
   end
 end
