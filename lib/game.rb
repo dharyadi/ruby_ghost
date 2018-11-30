@@ -6,7 +6,7 @@ class Game
   MIN_PLAYERS = 2
   MAX_PLAYERS = 4
   DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([ nil ]).to_h
-  LOSING_TEXT = 'GH'.freeze
+  LOSING_TEXT = 'GHOST'.freeze
 
   def initialize(num_players)
     # Make player objects
@@ -29,6 +29,10 @@ class Game
       @scores[name] = 0
     end
     play
+  end
+
+  def self.welcome_message
+    puts "Here we go, let's start a new word!"
   end
 
   def self.validate_num_players(num_players)
@@ -128,6 +132,8 @@ class Game
   def round
     turns = 0
     fragment = ''
+
+    Game.welcome_message
 
     until Game.fragment_is_word?(fragment)
       current_player = @players[ turns % @players.length ]
