@@ -5,6 +5,7 @@ class Game
   attr_reader :players
   @@MIN_PLAYERS = 2
   @@MAX_PLAYERS = 4
+  @@DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([nil]).to_h
 
   def initialize(num_players)
     num_players = validate_num_players(num_players)
@@ -26,10 +27,10 @@ class Game
       @players << Player.new(gets.chomp)
     end
   end
+
 end
 
 if $PROGRAM_NAME == __FILE__
-  #game = Game.new('cat')
   game = Game.new(3)
   p game.players
 end
