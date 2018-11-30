@@ -17,6 +17,20 @@ class Game
     @scores = @players.map { |player| [ player.name, 0 ] }.to_h
   end
 
+  def share_dictionary
+    DICTIONARY
+  end
+
+  def restart
+    # Reset players array w/ same names & reset scores hash
+    @players = []
+    @scores.each_key do |name|
+      @players << Player.new(name) 
+      @scores[name] = 0
+    end
+    play
+  end
+
   def self.validate_num_players(num_players)
     until (MIN_PLAYERS..MAX_PLAYERS).include?(num_players)
       puts "Please enter a number between #{ MIN_PLAYERS } and #{ MAX_PLAYERS }."
@@ -102,14 +116,13 @@ class Game
     puts 'SCOREBOARD:'
     @scores.each { |name, score| puts "#{name}: #{score_to_text(score)}" }
     puts '-----------------------------------------'
+    puts
   end
 
   def word_complete(turns, player)
     puts "Word complete! Great job #{player.name}"
     set_loser(turns)
     puts
-    # show_scores
-    # puts
   end
 
   def round
