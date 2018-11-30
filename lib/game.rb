@@ -32,9 +32,29 @@ class Game
       players << Player.new(gets.chomp)
     end
   end
+
+  def fragment_is_word?(fragment)
+    DICTIONARY.key?(fragment)
+  end
+
+  def valid_fragment?(fragment)
+    DICTIONARY.each_key do |word|
+      return true if word[0...fragment.length] == fragment
+    end
+    false
+  end
+
+  def round
+    turns = 0
+
+  end
 end
 
 if $PROGRAM_NAME == __FILE__
   game = Game.new(3)
   p game.players
+  p game.fragment_is_word?('guess')
+  p game.fragment_is_word?('123')
+  p game.valid_fragment?('gu')
+  p game.valid_fragment?('3')
 end
