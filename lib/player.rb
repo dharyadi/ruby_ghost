@@ -16,12 +16,7 @@ class Player
     test_name.capitalize
   end
 
-  def get_guess
-    puts 'Please enter a letter:'
-    Player.valid_guess(gets.chomp.downcase)
-  end
-
-  def self.valid_guess(str)
+  def valid_guess(str)
     while /^[a-z]$/.match(str) == nil
       puts 'Please enter a valid letter from A to Z.'
       str = gets.chomp.downcase
@@ -34,5 +29,5 @@ end
 if $PROGRAM_NAME == __FILE__
   player = Player.new('')
   puts player.name
-  p player.get_guess
+  #p player.get_guess
 end
