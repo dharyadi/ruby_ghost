@@ -12,3 +12,4 @@ ghost = Game.new(gets.chomp.to_i)
 # Show who's playing
 player_names = ghost.players.map { |player| player.name }
 puts "Playing today, we have: #{player_names.join(', ')}"
+puts "Let's Begin!"
