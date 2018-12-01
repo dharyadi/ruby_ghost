@@ -3,12 +3,11 @@ require_relative './player.rb'
 require_relative './ai_player.rb'
 
 class Game
-  attr_reader :players
+  attr_reader :players, :fragment
   MIN_PLAYERS = 2
   MAX_PLAYERS = 4
   DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([ nil ]).to_h
   LOSING_TEXT = 'GHOST'.freeze
-  @@fragment = ''
 
   def initialize(num_players)
     # Make player objects
@@ -17,6 +16,7 @@ class Game
     Game.create_players(num_players, @players)
     # Track scores in a hash
     @scores = @players.map { |player| [ player.name, 0 ] }.to_h
+    @fragment = ''
   end
 
   def self.share_dictionary
@@ -54,8 +54,21 @@ class Game
     puts
   end
 
+  def self.num_matches(fragment)
+    count = 0
+    DICTIONARY.each_key do |word|
+      count += 1 if word[ 0...fragment.length ] == fragment
+    end
+    count
+  end
+  # if only one matching word, return true, otherwise, randomly decide
   def self.fragment_is_word?(fragment)
-    DICTIONARY.key?(fragment)
+    match_count = Game.num_matches(fragment)
+    if DICTIONARY.key?(fragment)
+      return true if match_count == 1
+      return true if rand(match_count) == 0
+    end
+    false
   end
 
   def self.valid_fragment?(fragment)
@@ -90,10 +103,6 @@ class Game
   def self.show_fragment(fragment)
     puts
     puts "Fragment: #{ fragment }"
-  end
-
-  def self.share_fragment
-    @@fragment
   end
 
   def update_players_list(player)
@@ -142,7 +151,7 @@ class Game
     Game.welcome_message
 
     until Game.fragment_is_word?(fragment)
-      @@fragment = fragment # for Ai Player
+      @fragment = fragment # for Ai Player
       current_player = @players[ turns % @players.length ]
       guess = Game.get_guess(current_player)
       if Game.valid_fragment?(fragment + guess)
