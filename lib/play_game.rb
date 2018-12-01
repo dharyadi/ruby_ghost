@@ -1,6 +1,7 @@
 # Start the game off by using necessary classes
 
 require_relative './player.rb'
+require_relative './ai_player.rb'
 require_relative './game.rb'
 
 def valid_response(str)
@@ -22,6 +23,9 @@ puts
 puts 'How many players?'
 ghost = Game.new(gets.chomp.to_i)
 puts
+
+# Share game instance w/ AI
+AI_Player.set_game_instance(ghost)
 
 # Show who's playing
 player_names = ghost.players.map { |player| player.name }
