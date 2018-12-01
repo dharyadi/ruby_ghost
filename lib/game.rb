@@ -1,5 +1,6 @@
 # All game functions for turns, rounds, wins, losses
 require_relative './player.rb'
+require_relative './ai_player.rb'
 
 class Game
   attr_reader :players
@@ -7,6 +8,7 @@ class Game
   MAX_PLAYERS = 4
   DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([ nil ]).to_h
   LOSING_TEXT = 'GHOST'.freeze
+  @@fragment = ''
 
   def initialize(num_players)
     # Make player objects
@@ -17,7 +19,7 @@ class Game
     @scores = @players.map { |player| [ player.name, 0 ] }.to_h
   end
 
-  def share_dictionary
+  def self.share_dictionary
     DICTIONARY
   end
 
@@ -65,7 +67,7 @@ class Game
 
   def self.get_guess(player)
     puts "#{ player.name }, please choose a letter from A-Z:"
-    player.valid_guess(gets.chomp.downcase)
+    player.valid_guess
   end
 
   def update_score(player)
@@ -88,6 +90,10 @@ class Game
   def self.show_fragment(fragment)
     puts
     puts "Fragment: #{ fragment }"
+  end
+
+  def self.share_fragment
+    @@fragment
   end
 
   def update_players_list(player)
@@ -136,6 +142,7 @@ class Game
     Game.welcome_message
 
     until Game.fragment_is_word?(fragment)
+      @@fragment = fragment # for Ai Player
       current_player = @players[ turns % @players.length ]
       guess = Game.get_guess(current_player)
       if Game.valid_fragment?(fragment + guess)
