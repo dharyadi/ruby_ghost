@@ -2,15 +2,11 @@ require_relative './game.rb'
 
 class AI_Player
   BAD_NUMBER = 1
-  @@game = nil
 
-  def initialize
+  def initialize(game)
+    @game = game
     @dictionary = Game.share_dictionary
     @name = 'AI Bot'
-  end
-
-  def self.set_game_instance(game)
-    @@game = game
   end
 
   def self.score(loss_factor, rounds_left)
@@ -21,22 +17,20 @@ class AI_Player
   end
 
   def valid_guess
-    # fragment = @@game.fragment
-    # players = @@game.players
-    fragment = 'ca'
-    players = ['T', 'K', 'A']
+    fragment = @game.fragment
+    num_players = @game.players.length
     options = Hash.new(0)
     final_fragment_len = fragment.length + 1
 
     @dictionary.each_key do |word|
       if fragment == word[0...fragment.length]
         return word[fragment.length] if final_fragment_len == word.length
-        loss_factor = (word.length - final_fragment_len) % players.length
-        rounds_left = (word.length - final_fragment_len) / players.length
+        letters_left = word.length - final_fragment_len
+        loss_factor = (letters_left) % num_players
+        rounds_left = (letters_left) / num_players
         options[word[fragment.length]] += AI_Player.score(loss_factor, rounds_left)
       end
     end
-    p options
     options.key(options.values.max)
   end
 end
