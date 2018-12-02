@@ -8,7 +8,7 @@ class Player
 
   def self.valid_name(name)
     test_name = name
-    while test_name == ''
+    while test_name == '' || test_name == 'AI Bot'
       puts 'Please enter a valid name.'
       test_name = gets.chomp
     end
