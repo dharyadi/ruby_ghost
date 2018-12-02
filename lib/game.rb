@@ -1,35 +1,47 @@
 # All game functions for turns, rounds, wins, losses
 require_relative './player.rb'
-require_relative './ai_player.rb'
 
 class Game
   attr_reader :players, :fragment
-  MIN_PLAYERS = 2
+  MIN_PLAYERS = 1
   MAX_PLAYERS = 4
   DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([ nil ]).to_h
   LOSING_TEXT = 'GHOST'.freeze
 
-  def initialize(num_players)
+  def initialize(num_players, ai_player)
     # Make player objects
     num_players = Game.validate_num_players(num_players)
     @players = []
-    Game.create_players(num_players, @players)
+    @ai_player = ai_player
+    create_players(num_players)
     # Track scores in a hash
-    @scores = @players.map { |player| [ player.name, 0 ] }.to_h
+    @scores = make_scores_hash
     @fragment = ''
+  end
+
+  def make_scores_hash
+    @players.map { |player| [ player.name, 0 ] }.to_h
   end
 
   def self.share_dictionary
     DICTIONARY
   end
 
-  def restart
-    # Reset players array w/ same names & reset scores hash
+  def clear_players
     @players = []
+  end
+
+  def reset_scores
     @scores.each_key do |name|
-      @players << Player.new(name) 
+      name == 'AI Bot' ? @players << @ai_player : @players << Player.new(name)
       @scores[name] = 0
     end
+  end
+
+  def restart
+    # Reset players array w/ same names & reset scores hash
+    clear_players
+    reset_scores
     play
   end
 
@@ -45,13 +57,15 @@ class Game
     num_players
   end
 
-  def self.create_players(num_players, players)
+  def create_players(num_players)
     num_players.times do |num|
       puts "Player #{ num + 1 } name:"
-      players << Player.new(gets.chomp)
+      @players << Player.new(gets.chomp)
     end
     puts '-----------------------------------------'
     puts
+    # Add AI PLayer if only 1 player selected
+    @players << @ai_player if num_players == 1
   end
 
   def self.num_matches(fragment)
@@ -109,7 +123,7 @@ class Game
     if @scores[player.name] == LOSING_TEXT.length
       puts "Sorry #{ player.name }, you're out!"
       @players.delete(player)
-      true
+      return true
     end
     false
   end
@@ -147,23 +161,27 @@ class Game
   def round
     turns = 0
     fragment = ''
+    fragment_updated = false
 
     Game.welcome_message
 
-    until Game.fragment_is_word?(fragment)
+    until Game.fragment_is_word?(fragment) && fragment_updated
+      Game.show_fragment(fragment)
       @fragment = fragment # for Ai Player
-      current_player = @players[ turns % @players.length ]
+      turns = 0 if turns == players.length
+      current_player = @players[turns]
       guess = Game.get_guess(current_player)
       if Game.valid_fragment?(fragment + guess)
         Game.show_good_message
         fragment += guess
+        fragment_updated = true
       else
         show_bad_message(current_player)
         update_score(current_player)
         turns -= 1 if update_players_list(current_player)
+        fragment_updated = false
       end
       return if winner?
-      Game.show_fragment(fragment)
       turns += 1
     end
     word_complete(turns, current_player)
