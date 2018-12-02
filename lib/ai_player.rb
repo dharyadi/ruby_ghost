@@ -16,22 +16,32 @@ class AI_Player
     -2
   end
 
-  def valid_guess
+  def make_options_hash
     fragment = @game.fragment
     num_players = @game.players.length
     options = Hash.new(0)
+    fragment_length = fragment.length
     final_fragment_len = fragment.length + 1
 
     @dictionary.each_key do |word|
-      if fragment == word[0...fragment.length]
-        return word[fragment.length] if final_fragment_len == word.length
+      if fragment == word[0...fragment_length]
+        return word[fragment_length] if final_fragment_len == word.length
         letters_left = word.length - final_fragment_len
         loss_factor = (letters_left) % num_players
         rounds_left = (letters_left) / num_players
-        options[word[fragment.length]] += AI_Player.score(loss_factor, rounds_left)
+        options[word[fragment_length]] += AI_Player.score(loss_factor, rounds_left)
       end
     end
+    options
+  end
+
+  def choose_best_option(options)
     options.key(options.values.max)
+  end
+
+  def valid_guess
+    options = make_options_hash
+    choose_best_option(options)
   end
 end
 
