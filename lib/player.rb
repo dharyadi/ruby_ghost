@@ -18,7 +18,7 @@ class Player
 
   def valid_guess
     str = gets.chomp.downcase
-    while /^[a-z]$/.match(str) == nil
+    while /^[a-z]$/.match(str).nil?
       puts 'Please enter a valid letter from A to Z.'
       str = gets.chomp.downcase
     end
