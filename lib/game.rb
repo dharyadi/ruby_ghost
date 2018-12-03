@@ -5,7 +5,7 @@ class Game
   attr_reader :players, :fragment
   MIN_PLAYERS = 1
   MAX_PLAYERS = 4
-  DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([ nil ]).to_h
+  DICTIONARY = File.read('dictionary.txt').split(/\n+/).product([nil]).to_h
   LOSING_TEXT = 'GHOST'.freeze
 
   def initialize(num_players, ai_player)
@@ -20,7 +20,7 @@ class Game
   end
 
   def make_scores_hash
-    @players.map { |player| [ player.name, 0 ] }.to_h
+    @players.map { |player| [player.name, 0] }.to_h
   end
 
   def self.share_dictionary
@@ -51,7 +51,7 @@ class Game
 
   def self.validate_num_players(num_players)
     until (MIN_PLAYERS..MAX_PLAYERS).include?(num_players)
-      puts "Please enter a number between #{ MIN_PLAYERS } and #{ MAX_PLAYERS }."
+      puts "Please enter a number between #{MIN_PLAYERS} and #{MAX_PLAYERS}."
       num_players = gets.chomp.to_i
     end
     num_players
@@ -59,7 +59,7 @@ class Game
 
   def create_players(num_players)
     num_players.times do |num|
-      puts "Player #{ num + 1 } name:"
+      puts "Player #{num + 1} name:"
       @players << Player.new(gets.chomp)
     end
     puts '-----------------------------------------'
@@ -71,7 +71,7 @@ class Game
   def self.num_matches(fragment)
     count = 0
     DICTIONARY.each_key do |word|
-      count += 1 if word[ 0...fragment.length ] == fragment
+      count += 1 if word[0...fragment.length] == fragment
     end
     count
   end
@@ -80,25 +80,25 @@ class Game
     match_count = Game.num_matches(fragment)
     if DICTIONARY.key?(fragment)
       return true if match_count == 1
-      return true if rand(match_count) == 0
+      return true if rand(match_count).zero?
     end
     false
   end
 
   def self.valid_fragment?(fragment)
     DICTIONARY.each_key do |word|
-      return true if word[ 0...fragment.length ] == fragment
+      return true if word[0...fragment.length] == fragment
     end
     false
   end
 
   def self.get_guess(player)
-    puts "#{ player.name }, please choose a letter from A-Z:"
+    puts "#{player.name}, please choose a letter from A-Z:"
     player.valid_guess
   end
 
   def update_score(player)
-    @scores[ player.name ] += 1
+    @scores[player.name] += 1
   end
 
   def score_to_text(score)
@@ -106,8 +106,8 @@ class Game
   end
 
   def show_bad_message(player)
-    ghost_letter = LOSING_TEXT[ @scores[ player.name ] ]
-    puts "Oh no, #{ player.name } you’re getting a #{ ghost_letter } of doom."
+    ghost_letter = LOSING_TEXT[@scores[player.name]]
+    puts "Oh no, #{player.name} you’re getting a #{ghost_letter} of doom."
   end
 
   def self.show_good_message
@@ -116,12 +116,12 @@ class Game
 
   def self.show_fragment(fragment)
     puts
-    puts "Fragment: #{ fragment }"
+    puts "Fragment: #{fragment}"
   end
 
   def update_players_list(player)
     if @scores[player.name] == LOSING_TEXT.length
-      puts "Sorry #{ player.name }, you're out!"
+      puts "Sorry #{player.name}, you're out!"
       @players.delete(player)
       return true
     end
@@ -137,8 +137,8 @@ class Game
     puts
   end
 
-  def set_loser(turns)
-    loser = @players[ (turns - 2) % @players.length ]
+  def loser_sequence(turns)
+    loser = @players[(turns - 2) % @players.length]
     show_bad_message(loser)
     update_score(loser)
     update_players_list(loser)
@@ -154,7 +154,7 @@ class Game
 
   def word_complete(turns, player)
     puts "Word complete! Great job #{player.name}"
-    set_loser(turns)
+    loser_sequence(turns)
     puts
   end
 
