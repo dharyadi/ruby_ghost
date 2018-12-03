@@ -14,11 +14,16 @@ class AI_Player
     @game = game
   end
 
-  def self.score(loss_factor, rounds_left)
-    return 2 if loss_factor != BAD_NUMBER && rounds_left == 0
-    return 1 if loss_factor != BAD_NUMBER && rounds_left > 0
-    return -1 if loss_factor == BAD_NUMBER && rounds_left > 0
-    -2
+  def self.score(letters_left, num_players)
+    loss_factor = letters_left % num_players
+    rounds_left = letters_left / num_players
+    if loss_factor != BAD_NUMBER
+      return 2 if rounds_left.zero?
+      1
+    else
+      return -1 if rounds_left > 0
+      -2
+    end
   end
 
   def make_options_hash
@@ -33,10 +38,8 @@ class AI_Player
         next_letter = word[fragment_length]
         return next_letter if final_fragment_len == word.length
         letters_left = word.length - final_fragment_len
-        loss_factor = (letters_left) % num_players
-        rounds_left = (letters_left) / num_players
         unless next_letter.nil?
-          options[next_letter] += AI_Player.score(loss_factor, rounds_left)
+          options[next_letter] += AI_Player.score(letters_left, num_players)
         end
       end
     end
