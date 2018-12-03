@@ -28,11 +28,11 @@ puts 'Select 1 to play against the AI.'
 ghost = Game.new(gets.chomp.to_i, ai_player)
 puts
 
-# Share game instance w/ AI & vice versa
+# Share game instance w/ AI
 ai_player.add_game(ghost)
 
 # Show who's playing
-player_names = ghost.players.map { |player| player.name }
+player_names = ghost.players.map(&:name)
 puts "Playing today, we have: #{player_names.join(', ')}"
 puts "Let's Begin!"
 puts
