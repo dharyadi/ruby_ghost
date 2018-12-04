@@ -3,17 +3,7 @@
 class Player
   attr_reader :name
   def initialize(name)
-    @name = Player.valid_name(name)
-  end
-
-  def self.valid_name(name)
-    test_name = name
-    while test_name == '' || test_name == 'AI Bot'
-      puts 'Please enter a valid name.'
-      test_name = gets.chomp
-    end
-
-    test_name.capitalize
+    @name = valid_name(name)
   end
 
   def valid_guess
@@ -24,6 +14,19 @@ class Player
     end
 
     str
+  end
+
+  # Begin Private Methods
+  private
+
+  def valid_name(name)
+    test_name = name
+    while test_name == '' || test_name == 'AI Bot'
+      puts 'Please enter a valid name.'
+      test_name = gets.chomp
+    end
+
+    test_name.capitalize
   end
 end
 
