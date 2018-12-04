@@ -82,7 +82,7 @@ class Game
   def num_matches
     count = 0
     DICTIONARY.each_key do |word|
-      count += 1 if word[0...@fragment.length] == @fragment
+      count += 1 if word.start_with?(@fragment)
     end
     count
   end
@@ -99,7 +99,7 @@ class Game
 
   def valid_fragment?(fragment)
     DICTIONARY.each_key do |word|
-      return true if word[0...fragment.length] == fragment
+      return true if word.start_with?(fragment)
     end
     false
   end
