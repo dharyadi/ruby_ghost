@@ -79,18 +79,18 @@ class Game
     @players << @ai_player if num_players == 1
   end
 
-  def num_matches(fragment)
+  def num_matches
     count = 0
     DICTIONARY.each_key do |word|
-      count += 1 if word[0...fragment.length] == fragment
+      count += 1 if word[0...@fragment.length] == @fragment
     end
     count
   end
   
   # if only one matching word, return true, otherwise, randomly decide
-  def fragment_is_word?(fragment)
-    match_count = num_matches(fragment)
-    if DICTIONARY.key?(fragment)
+  def fragment_is_word?
+    match_count = num_matches
+    if DICTIONARY.key?(@fragment)
       return true if match_count == 1
       return true if rand(match_count).zero?
     end
@@ -126,9 +126,9 @@ class Game
     puts 'Good job! Fragment updated.'
   end
 
-  def show_fragment(fragment)
+  def show_fragment
     puts
-    puts "Fragment: #{fragment}"
+    puts "Fragment: #{@fragment}"
   end
 
   def update_players_list(player)
@@ -164,43 +164,55 @@ class Game
     puts
   end
 
-  def word_complete(turns, player, fragment)
+  def word_complete(turns, player)
     puts
     puts "Word complete! Great job #{player.name}"
-    puts "Final word is #{fragment}"
+    puts "Final word is #{@fragment}"
     puts
     loser_sequence(turns)
     puts
     sleep(3)
   end
 
+  def select_player(turns)
+    @players[turns]
+  end
+
+  def set_turns(is_loser, turns)
+    turns = is_loser ? turns - 1 : turns + 1
+    turns = 0 if turns >= @players.length
+    turns
+  end
+
+  def process_guess(guess, current_player)
+    if valid_fragment?(@fragment + guess)
+      show_good_message
+      @fragment += guess
+      true
+    else
+      show_bad_message(current_player)
+      update_score(current_player)
+      false
+    end
+  end
+
   def round
     turns = 0
-    fragment = ''
+    @fragment = ''
     fragment_updated = false
 
     welcome_message
 
-    until fragment_is_word?(fragment) && fragment_updated
-      show_fragment(fragment)
-      @fragment = fragment # for Ai Player
-      turns = 0 if turns == players.length
-      current_player = @players[turns]
+    until fragment_is_word? && fragment_updated
+      show_fragment
+      current_player = select_player(turns)
       guess = get_guess(current_player)
-      if valid_fragment?(fragment + guess)
-        show_good_message
-        fragment += guess
-        fragment_updated = true
-      else
-        show_bad_message(current_player)
-        update_score(current_player)
-        turns -= 1 if update_players_list(current_player)
-        fragment_updated = false
-      end
+      fragment_updated = process_guess(guess, current_player)
+      is_loser = update_players_list(current_player)
+      turns = set_turns(is_loser, turns)
       return if winner?
-      turns += 1
     end
-    word_complete(turns, current_player, fragment)
+    word_complete(turns, current_player)
   end
 end
 
