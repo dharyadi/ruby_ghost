@@ -152,10 +152,14 @@ class Game
     puts
   end
 
-  def word_complete(turns, player)
+  def word_complete(turns, player, fragment)
+    puts
     puts "Word complete! Great job #{player.name}"
+    puts "Final word is #{fragment}"
+    puts
     loser_sequence(turns)
     puts
+    sleep(3)
   end
 
   def round
@@ -184,7 +188,7 @@ class Game
       return if winner?
       turns += 1
     end
-    word_complete(turns, current_player)
+    word_complete(turns, current_player, fragment)
   end
 
   def play
