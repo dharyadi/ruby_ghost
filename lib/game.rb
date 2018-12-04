@@ -10,7 +10,7 @@ class Game
 
   def initialize(num_players, ai_player)
     # Make player objects
-    num_players = Game.validate_num_players(num_players)
+    num_players = validate_num_players(num_players)
     @players = []
     @ai_player = ai_player
     create_players(num_players)
@@ -19,12 +19,30 @@ class Game
     @fragment = ''
   end
 
-  def make_scores_hash
-    @players.map { |player| [player.name, 0] }.to_h
+  def play
+    until winner?
+      round
+      show_scores
+    end
+    show_winner
+  end
+
+  def restart
+    # Reset players array w/ same names & reset scores hash
+    clear_players
+    reset_scores
+    play
   end
 
   def self.share_dictionary
     DICTIONARY
+  end
+
+  # Begin Private Methods
+  private
+
+  def make_scores_hash
+    @players.map { |player| [player.name, 0] }.to_h
   end
 
   def clear_players
@@ -38,18 +56,11 @@ class Game
     end
   end
 
-  def restart
-    # Reset players array w/ same names & reset scores hash
-    clear_players
-    reset_scores
-    play
-  end
-
-  def self.welcome_message
+  def welcome_message
     puts "Here we go, let's start a new word!"
   end
 
-  def self.validate_num_players(num_players)
+  def validate_num_players(num_players)
     until (MIN_PLAYERS..MAX_PLAYERS).include?(num_players)
       puts "Please enter a number between #{MIN_PLAYERS} and #{MAX_PLAYERS}."
       num_players = gets.chomp.to_i
@@ -68,16 +79,17 @@ class Game
     @players << @ai_player if num_players == 1
   end
 
-  def self.num_matches(fragment)
+  def num_matches(fragment)
     count = 0
     DICTIONARY.each_key do |word|
       count += 1 if word[0...fragment.length] == fragment
     end
     count
   end
+  
   # if only one matching word, return true, otherwise, randomly decide
-  def self.fragment_is_word?(fragment)
-    match_count = Game.num_matches(fragment)
+  def fragment_is_word?(fragment)
+    match_count = num_matches(fragment)
     if DICTIONARY.key?(fragment)
       return true if match_count == 1
       return true if rand(match_count).zero?
@@ -85,14 +97,14 @@ class Game
     false
   end
 
-  def self.valid_fragment?(fragment)
+  def valid_fragment?(fragment)
     DICTIONARY.each_key do |word|
       return true if word[0...fragment.length] == fragment
     end
     false
   end
 
-  def self.get_guess(player)
+  def get_guess(player)
     puts "#{player.name}, please choose a letter from A-Z:"
     player.valid_guess
   end
@@ -110,11 +122,11 @@ class Game
     puts "Oh no, #{player.name} you’re getting a #{ghost_letter} of doom."
   end
 
-  def self.show_good_message
+  def show_good_message
     puts 'Good job! Fragment updated.'
   end
 
-  def self.show_fragment(fragment)
+  def show_fragment(fragment)
     puts
     puts "Fragment: #{fragment}"
   end
@@ -167,16 +179,16 @@ class Game
     fragment = ''
     fragment_updated = false
 
-    Game.welcome_message
+    welcome_message
 
-    until Game.fragment_is_word?(fragment) && fragment_updated
-      Game.show_fragment(fragment)
+    until fragment_is_word?(fragment) && fragment_updated
+      show_fragment(fragment)
       @fragment = fragment # for Ai Player
       turns = 0 if turns == players.length
       current_player = @players[turns]
-      guess = Game.get_guess(current_player)
-      if Game.valid_fragment?(fragment + guess)
-        Game.show_good_message
+      guess = get_guess(current_player)
+      if valid_fragment?(fragment + guess)
+        show_good_message
         fragment += guess
         fragment_updated = true
       else
@@ -189,14 +201,6 @@ class Game
       turns += 1
     end
     word_complete(turns, current_player, fragment)
-  end
-
-  def play
-    until winner?
-      round
-      show_scores
-    end
-    show_winner
   end
 end
 
