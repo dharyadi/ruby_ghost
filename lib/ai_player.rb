@@ -1,6 +1,6 @@
 require_relative './game.rb'
 
-class AI_Player
+class AiPlayer
   attr_reader :name
   BAD_NUMBER = 1
 
@@ -14,7 +14,18 @@ class AI_Player
     @game = game
   end
 
-  def self.score(letters_left, num_players)
+  def valid_guess
+    options = make_options
+    choice = options.is_a?(String) ? options : choose_best_option(options)
+    sleep(1)
+    puts choice
+    choice
+  end
+
+  # Begin Private Methods, Internal Use Only
+  private
+
+  def score(letters_left, num_players)
     loss_factor = letters_left % num_players
     rounds_left = letters_left / num_players
     if loss_factor != BAD_NUMBER
@@ -26,36 +37,38 @@ class AI_Player
     end
   end
 
-  def make_options_hash
+  def valid_fragment?(fragment, word)
+    fragment == word[0...fragment.length]
+  end
+
+  def is_word?(fragment, word)
+    fragment.length + 1 == word.length
+  end
+
+  def add_key_val(options, word, fragment, num_players)
+    next_letter = word[fragment.length]
+    letters_left = word.length - fragment.length - 1
+    options[next_letter] += score(letters_left, num_players) unless next_letter.nil?
+  end
+
+  def make_options
     fragment = @game.fragment
     num_players = @game.players.length
-    options = Hash.new(0)
     fragment_length = fragment.length
-    final_fragment_len = fragment.length + 1
+    options = Hash.new(0)
 
     @dictionary.each_key do |word|
-      if fragment == word[0...fragment_length]
-        next_letter = word[fragment_length]
-        return next_letter if final_fragment_len == word.length
-        letters_left = word.length - final_fragment_len
-        unless next_letter.nil?
-          options[next_letter] += AI_Player.score(letters_left, num_players)
-        end
-      end
+      next unless valid_fragment?(fragment, word)
+      next_letter = word[fragment_length]
+      return next_letter if is_word?(fragment, word)
+      add_key_val(options, word, fragment, num_players)
     end
+
     options
   end
 
   def choose_best_option(options)
     options.key(options.values.max)
-  end
-
-  def valid_guess
-    options = make_options_hash
-    choice = options.is_a?(String) ? options : choose_best_option(options)
-    sleep(1)
-    puts choice
-    choice
   end
 end
 
