@@ -18,7 +18,7 @@ def play_again_response
 end
 
 # Create AI Player
-ai_player = AI_Player.new
+ai_player = AiPlayer.new
 
 # Welcome and get player number
 puts 'Welcome to GHOST! Ooh, it’s spooooooky!'
