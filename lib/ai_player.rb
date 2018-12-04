@@ -38,10 +38,10 @@ class AiPlayer
   end
 
   def valid_fragment?(fragment, word)
-    fragment == word[0...fragment.length]
+    word.start_with?(fragment)
   end
 
-  def is_word?(fragment, word)
+  def word?(fragment, word)
     fragment.length + 1 == word.length
   end
 
@@ -60,7 +60,7 @@ class AiPlayer
     @dictionary.each_key do |word|
       next unless valid_fragment?(fragment, word)
       next_letter = word[fragment_length]
-      return next_letter if is_word?(fragment, word)
+      return next_letter if word?(fragment, word)
       add_key_val(options, word, fragment, num_players)
     end
 
